@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+	<id><![CDATA[Display ID & status in admin's Category List]]></id>
+	<name><![CDATA[Display ID & status in admin's Category List]]></name>
+	<code>knns-display-id-in-admins-category-list</code>
+	<version>0.1.0</version>
+	<author><![CDATA[<font color="#7F458C"><b>kanenas.net (aka Nikolas Branis)</b></font> - nbran@kanenas.net]]></author>
+	<link>https://kanenas.net/</link>
+		<file path="admin/model/catalog/category.php" error="log">
+			<operation error="log">
+				<search><![CDATA[$sql = "SELECT cp.category_id AS category_id, GROUP_CONCAT(cd1.name ORDER BY cp.level SEPARATOR '&nbsp;&nbsp;&gt;&nbsp;&nbsp;') AS name, c1.parent_id, c1.sort_order FROM " . DB_PREFIX . "category_path cp LEFT JOIN " . DB_PREFIX . "category c1 ON (cp.category_id = c1.category_id) LEFT JOIN " . DB_PREFIX . "category c2 ON (cp.path_id = c2.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd1 ON (cp.path_id = cd1.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd2 ON (cp.category_id = cd2.category_id) WHERE cd1.language_id = '" . (int)$this->config->get('config_language_id') . "' AND cd2.language_id = '" . (int)$this->config->get('config_language_id') . "'";]]></search>
+				<add position="replace"><![CDATA[
+		// kanenas: knns_admin_category_list_display_status.xml (start) <<
+		$sql = "SELECT cp.category_id AS category_id, GROUP_CONCAT(cd1.name ORDER BY cp.level SEPARATOR '&nbsp;&nbsp;&gt;&nbsp;&nbsp;') AS name, c1.parent_id, c1.sort_order, c1.status FROM " . DB_PREFIX . "category_path cp LEFT JOIN " . DB_PREFIX . "category c1 ON (cp.category_id = c1.category_id) LEFT JOIN " . DB_PREFIX . "category c2 ON (cp.path_id = c2.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd1 ON (cp.path_id = cd1.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd2 ON (cp.category_id = cd2.category_id) WHERE cd1.language_id = '" . (int)$this->config->get('config_language_id') . "' AND cd2.language_id = '" . (int)$this->config->get('config_language_id') . "'";
+		// kanenas: knns_admin_category_list_display_status.xml (end) <<
+				]]></add>
+			</operation>
+		</file>
+		<file path="admin/controller/catalog/category.php" error="log">
+			<operation error="log">
+				<search><![CDATA['sort_order'  => $result['sort_order'],]]></search>
+				<add position="before"><![CDATA[
+				// kanenas: knns_admin_category_list_display_status.xml (start) <<
+				'status'  => $result['status'],
+				// kanenas: knns_admin_category_list_display_status.xml (end) <<
+				]]></add>
+			</operation>
+		</file>
+		<file path="admin/view/template/catalog/category_list.twig" error="log">
+			<operation error="log">
+				<search><![CDATA[<td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></td>]]></search>
+				<add position="after"><![CDATA[
+									{# kanenas: knns_admin_category_list_display_status.xml (start) << #}
+									<td class="text-center">ID</td>
+									{# kanenas: knns_admin_category_list_display_status.xml (end) << #}
+				]]></add>
+			</operation>
+			<operation error="log">
+				<search><![CDATA[<td class="text-right">{% if sort == 'sort_order' %}]]></search>
+				<add position="before"><![CDATA[
+									{# kanenas: knns_admin_category_list_display_status.xml (start) << #}
+									<td class="text-center">{{ entry_status }}</td>
+									{# kanenas: knns_admin_category_list_display_status.xml (end) << #}
+				]]></add>
+			</operation>
+			<operation error="log">
+				<search><![CDATA[<td class="text-left">{{ category.name }}</td>]]></search>
+				<add position="before"><![CDATA[
+									{# kanenas: knns_admin_category_list_display_status.xml (start) << #}
+									<td class="text-center">{{ category.category_id }}</td>
+									{# kanenas: knns_admin_category_list_display_status.xml (end) << #}
+				]]></add>
+			</operation>
+			<operation error="log">
+				<search><![CDATA[<td class="text-left">{{ category.name }}</td>]]></search>
+				<add position="after"><![CDATA[
+									{# kanenas: knns_admin_category_list_display_status.xml (start) << #}
+									<td class="text-center">
+											{% if category.status == 1 %}
+												{{ text_enabled }}
+											{% else %}
+												{{ text_disabled }}
+											{% endif %}
+									</td>
+									{# kanenas: knns_admin_category_list_display_status.xml (end) << #}
+				]]></add>
+			</operation>
+			<operation error="log">
+				<search><![CDATA[<td class="text-center" colspan="4">{{ text_no_results }}</td>]]></search>
+				<add position="replace"><![CDATA[
+									{# kanenas: knns_admin_category_list_display_status.xml (start) << #}
+									<td class="text-center" colspan="6">{{ text_no_results }}</td>
+									{# kanenas: knns_admin_category_list_display_status.xml (end) << #}
+				]]></add>
+			</operation>
+		</file>
+</modification>
